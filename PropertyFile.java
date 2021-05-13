@@ -1,9 +1,9 @@
 package net.avdw.property;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.tinylog.Logger;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,44 +47,44 @@ public class PropertyFile {
      * @return Properties adhering to the load order
      */
     public Properties read(final String name) {
-        String propertyFilename = String.format("%s.properties", name);
-        Properties properties = new Properties();
+        final String propertyFilename = String.format("%s.properties", name);
+        final Properties properties = new Properties();
 
-        String classPath = String.format("/%s", propertyFilename);
+        final String classPath = String.format("/%s", propertyFilename);
         try (InputStream is = PropertyFile.class.getResourceAsStream(classPath)) {
-            Properties prop = new Properties();
+            final Properties prop = new Properties();
             prop.load(is);
             properties.putAll(prop);
-            int width = prop.keySet().stream().mapToInt(k -> k.toString().length()).max().orElseThrow();
+            final int width = prop.keySet().stream().mapToInt(k -> k.toString().length()).max().orElseThrow();
             Logger.debug("Classpath properties ({}):" +
                     "\n{}", classPath, prop.entrySet().stream()
                     .map(e -> String.format("%-" + width + "s = %s", e.getKey(), e.getValue()))
                     .sorted()
                     .collect(Collectors.joining("\n")));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             Logger.trace("No classpath properties (classpath://{})", classPath);
             throw new UnsupportedOperationException();
         }
 
-        Path localPath = Paths.get(propertyFilename);
+        final Path localPath = Paths.get(propertyFilename);
         try (FileReader reader = new FileReader(localPath.toString(), StandardCharsets.UTF_8)) {
-            Properties prop = new Properties();
+            final Properties prop = new Properties();
             prop.load(reader);
             properties.putAll(prop);
             Logger.debug("Local properties ({}):" +
                     "\n{}", localPath, prop);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             Logger.trace("No local properties ({})", localPath);
         }
 
-        Path globalPath = Paths.get(System.getProperty("user.home")).resolve(namespace).resolve(propertyFilename);
+        final Path globalPath = Paths.get(System.getProperty("user.home")).resolve(namespace).resolve(propertyFilename);
         try (FileReader reader = new FileReader(globalPath.toString(), StandardCharsets.UTF_8)) {
-            Properties prop = new Properties();
+            final Properties prop = new Properties();
             prop.load(reader);
             properties.putAll(prop);
             Logger.debug("Global properties ({}):" +
                     "\n{}", globalPath, prop);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             Logger.trace("No global properties ({})", globalPath);
         }
         return properties;
